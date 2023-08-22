@@ -1,0 +1,36 @@
+.journey-canvas-container .journey-canvas
+{
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.journey-canvas-container .journey-canvas.edit
+{
+    box-shadow: 0px 0px 25px green
+}
+
+.journey-canvas-container img.unused
+{
+    z-index: -1;
+    opacity: 0;
+}
+
+.journey-canvas-container div.control
+{
+    position: absolute;
+    z-index: +1;
+    left: 0;
+    top: 0;
+    display: flex;
+    justify-content: space-around;
+}
+
+.journey-canvas-container div.control a
+{
+    margin: 8px;
+    font-size: 2rem;
+    background-color: rgba(128, 128, 128, 0.61);
+    padding: 5px;
+    border-radius: 20%;
+}
