@@ -7,7 +7,7 @@ export default class JourneyDrawer extends PIXI.Application {
         this.stage.eventMode = 'static';
         this.drawingGraphics = new PIXI.Graphics();
         this.cursor = null;
-        this.path = [];
+        this.path = this.journey.flags.world?.journeyPath || [];
 
 
         this.init();
@@ -17,16 +17,17 @@ export default class JourneyDrawer extends PIXI.Application {
     init() {
         this.setBackground();
         this.createGraphicLayer()
-        // Ajout de la couche de dessin
-
+        if (this.path.length > 0) { this.drawPath() }
     }
+
     createGraphicLayer() {
-      
 
         // Positionnement de this.drawingGraphics au-dessus de tout
         this.stage.addChild(this.drawingGraphics);
         // Événements de la souris pour le dessin
         this.drawingGraphics.eventMode = 'static';
+
+        this.stage.on('mousemove', this.onMouseMove.bind(this));
         this.stage.on('mousedown', this.onMouseDown.bind(this));
         this.stage.on('mouseup', this.onMouseUp.bind(this));
         this.stage.addChild(this.drawingGraphics);
@@ -53,7 +54,12 @@ export default class JourneyDrawer extends PIXI.Application {
     toggleEditMode() {
         this.edit = !this.edit;
         this.view.classList.toggle('edit');
-        this.edit ? this.createCursor() : this.deleteCursor()
+        this.edit ? this.createCursor() : this.stopEdit()
+    }
+    async stopEdit() {
+        this.deleteCursor();
+        await this.journey.setFlag("world", "journeyPath", this.path)
+
     }
     createCursor() {
         // Create the circle
@@ -80,28 +86,41 @@ export default class JourneyDrawer extends PIXI.Application {
         console.log(this.stage.children.filter(ch => ch.name == "cursor"));
 
     }
+    onMouseMove(event) {
+        if (this.drawing) {
+            this.addPathPoint(event);
+            this.drawPath();
+        }
+    }
     onMouseDown(event) {
         if (!this.edit) { return }
         this.drawing = true;
-        this.drawPath(event)
+
+        this.addPathPoint(event);
+        this.drawPath()
     }
+    addPathPoint(event) {
+        this.path.push({ x: event.global.x, y: event.global.y });
 
-    drawPath(event) {
-        console.log("drawing");
-        console.log(this)
-    this.path.push({ x: event.global.x, y: event.global.y });
-        console.log(this.path);
-
-        this.drawingGraphics.lineStyle(2, 0xFFFFFF, 1);
+    }
+    drawPath() {
+        this.drawingGraphics.clear();
+        this.drawingGraphics.lineStyle(8, 0xFFFFFF, 3);
         this.drawingGraphics.moveTo(this.path[0].x, this.path[0].y);
         for (let coord of this.path) {
             this.drawingGraphics.lineTo(coord.x, coord.y)
         }
-
         this.stage.addChild(this.drawingGraphics);
     }
-
-    onMouseUp() {
+    clearPath() {
+        this.path = [];
+        this.drawingGraphics.clear()
+    }
+    undoPath() {
+        this.path.pop();
+        this.drawPath();
+    }
+    async onMouseUp() {
         this.drawing = false;
     }
 }

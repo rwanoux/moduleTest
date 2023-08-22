@@ -51,8 +51,18 @@ function createCanvas(journeySheet) {
         imgBut.addEventListener('click', () => {
             img.click()
         });
+        let clearBut = document.createElement('a');
+        clearBut.innerHTML = '<i class="fas fa-trash"></i>'
+        clearBut.addEventListener('click', () => {
+            pixiApp.clearPath()
+        });
+        let undoBut = document.createElement('a');
+        undoBut.innerHTML = '<i class="fa-solid fa-undo"></i>'
+        undoBut.addEventListener('click', () => {
+            pixiApp.undoPath()
+        });
         let controlDiv = document.createElement('DIV');
-        controlDiv.append(imgBut, editBut);
+        controlDiv.append(imgBut, editBut, undoBut, clearBut);
         controlDiv.classList.add('control')
         container.append(controlDiv);
     }
