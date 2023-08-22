@@ -7,6 +7,7 @@ export default class JourneyDrawer extends PIXI.Application {
         this.stage.eventMode = 'static';
         this.drawingGraphics = new PIXI.Graphics();
         this.cursor = null;
+        this.path = [];
 
 
         this.init();
@@ -20,8 +21,7 @@ export default class JourneyDrawer extends PIXI.Application {
 
     }
     createGraphicLayer() {
-        this.drawingGraphics.x = this.screen.width / 2;
-        this.drawingGraphics.y = this.screen.height / 2;
+      
 
         // Positionnement de this.drawingGraphics au-dessus de tout
         this.stage.addChild(this.drawingGraphics);
@@ -62,7 +62,7 @@ export default class JourneyDrawer extends PIXI.Application {
             .lineStyle({ color: "red", alpha: 0.5, width: 1 })
             .drawCircle(0, 0, 8)
             .endFill());
-        this.cursor.name="cursor";
+        this.cursor.name = "cursor";
         this.cursor.position.set(this.screen.width / 2, this.screen.height / 2);
         console.log(this.cursor.name)
 
@@ -75,19 +75,30 @@ export default class JourneyDrawer extends PIXI.Application {
         });
     }
     deleteCursor() {
-        console.log(this.stage.children.filter(ch=>ch.name=="cursor"));
-        this.stage.removeChildren(1)
-            console.log(this.stage.children.filter(ch=>ch.name=="cursor"));
+        console.log(this.stage.children.filter(ch => ch.name == "cursor"));
+        this.stage.removeChild(this.stage.getChildByName('cursor'))
+        console.log(this.stage.children.filter(ch => ch.name == "cursor"));
 
     }
     onMouseDown(event) {
-    if (!this.edit){return}
-    this.drawing=true;
+        if (!this.edit) { return }
+        this.drawing = true;
         this.drawPath(event)
     }
 
-    drawPath(event){
-        console.log("drawing")
+    drawPath(event) {
+        console.log("drawing");
+        console.log(this)
+    this.path.push({ x: event.global.x, y: event.global.y });
+        console.log(this.path);
+
+        this.drawingGraphics.lineStyle(2, 0xFFFFFF, 1);
+        this.drawingGraphics.moveTo(this.path[0].x, this.path[0].y);
+        for (let coord of this.path) {
+            this.drawingGraphics.lineTo(coord.x, coord.y)
+        }
+
+        this.stage.addChild(this.drawingGraphics);
     }
 
     onMouseUp() {
