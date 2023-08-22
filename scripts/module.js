@@ -15,7 +15,6 @@ Hooks.once('ready', async function () {
 Hooks.on('renderTor2eJourneyLogSheet', function (journeySheet, buttons) {
     createCanvas(journeySheet);
 
-    ui.notifications.notify('hooks on')
 });
 function createCanvas(journeySheet) {
     let html = journeySheet.element[0];

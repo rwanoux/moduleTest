@@ -39,16 +39,7 @@ export default class JourneyDrawer extends PIXI.Application {
         // move the sprite to the center of the screen
         background.x = this.screen.width / 2
         background.y = this.screen.height / 2;
-        console.log('_______________', background)
-        let ratio = background.width / background.height
 
-        if (background.width > background.height) {
-            background.width = this.screen.width;
-            background.height = background.width / ratio
-        } else {
-            background.height = this.screen.height;
-            background.width = background.height * ratio
-        }
         this.stage.addChild(background)
     }
     toggleEditMode() {
@@ -70,7 +61,6 @@ export default class JourneyDrawer extends PIXI.Application {
             .endFill());
         this.cursor.name = "cursor";
         this.cursor.position.set(this.screen.width / 2, this.screen.height / 2);
-        console.log(this.cursor.name)
 
         // Make sure the whole canvas area is interactive, not just the circle.
         this.stage.hitArea = this.screen;
@@ -81,9 +71,7 @@ export default class JourneyDrawer extends PIXI.Application {
         });
     }
     deleteCursor() {
-        console.log(this.stage.children.filter(ch => ch.name == "cursor"));
         this.stage.removeChild(this.stage.getChildByName('cursor'))
-        console.log(this.stage.children.filter(ch => ch.name == "cursor"));
 
     }
     onMouseMove(event) {
@@ -100,7 +88,21 @@ export default class JourneyDrawer extends PIXI.Application {
         this.drawPath()
     }
     addPathPoint(event) {
-        this.path.push({ x: event.global.x, y: event.global.y });
+        let distance = 0;
+        let lastPoint = this.path[this.path.length - 1];
+        if (lastPoint) {
+            let x = Math.sign(event.global.x) * event.global.x - lastPoint.x;
+            let y = Math.sign(event.global.y) * event.global.y - lastPoint.y;
+            distance = Math.sqrt(x * x + y + y);
+            if (distance > 10) {
+                this.path.push({ x: event.global.x, y: event.global.y });
+
+            }
+
+        } else {
+            this.path.push({ x: event.global.x, y: event.global.y });
+
+        }
 
     }
     drawPath() {
@@ -112,13 +114,17 @@ export default class JourneyDrawer extends PIXI.Application {
         }
         this.stage.addChild(this.drawingGraphics);
     }
-    clearPath() {
+    async clearPath() {
         this.path = [];
-        this.drawingGraphics.clear()
+        this.drawingGraphics.clear();
+        await this.journey.setFlag("world", "journeyPath", this.path)
+
     }
-    undoPath() {
+    async undoPath() {
         this.path.pop();
         this.drawPath();
+        await this.journey.setFlag("world", "journeyPath", this.path)
+
     }
     async onMouseUp() {
         this.drawing = false;
