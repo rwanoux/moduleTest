@@ -17,7 +17,17 @@
     }
   ],
   "relationships": {
-    "systems": [],
+    "systems": [
+      {
+        "id": "tor2e",
+        "type": "system",
+        "manifest": "https://gitlab.com/herve.darritchon/foundryvtt-tor2e/-/raw/main/src/system.json",
+        "compatibility": {
+          "minimum": "3.2.2",
+          "verified": "3.2.2"
+        }
+      }
+    ],
     "requires": []
   },
   "esmodules": [
